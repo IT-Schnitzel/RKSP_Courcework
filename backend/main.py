@@ -1,8 +1,11 @@
-from fastapi import FastAPI, Request
+import os
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from .routers import auth, tasks, projects, stats
 from .database import engine, Base
+
+PORT = os.getenv("PORT", "8000")
+print(f"🚀 Starting server on port {PORT}")
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,12 +24,9 @@ app.include_router(tasks.router)
 app.include_router(projects.router)
 app.include_router(stats.router)
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    return JSONResponse(
-        status_code=422,
-        content={"detail": f"Validation error: {str(exc)}"}
-    )
+@app.get("/")
+def root():
+    return {"message": "Task Manager API is running"}
 
 @app.get("/health")
 def health():
