@@ -1,6 +1,6 @@
 import os
 import time
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import OperationalError
 from .config import Config
@@ -18,7 +18,7 @@ for attempt in range(max_retries):
     try:
         engine = create_engine(Config.DATABASE_URL, echo=Config.DEBUG)
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         print(f"✅ Database connected successfully (attempt {attempt + 1})")
         break
     except OperationalError as e:
